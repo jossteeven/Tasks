@@ -1,0 +1,44 @@
+<html>
+    <h4>
+        Task Timer Auto-Save
+    </h4>
+    
+    <form class="contact-form" method="post">
+        First name: <input type="text" name="fname"><br>
+    </form>
+    <div class="form-status-holder"></div>
+</html>
+<script>
+    var timeoutId;
+    $('form input, form textarea').on('input propertychange change', function() {
+        console.log('Textarea Change');
+        
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(function() {
+            // Runs 1 second (1000 ms) after the last change    
+            saveToDB();
+        }, 1000);
+    });
+
+    function saveToDB()
+    {
+        console.log('Saving to the db');
+        form = $('.contact-form');
+        $.ajax({
+            url: "/echo/json/",
+            type: "POST",
+            data: form.serialize(), // serializes the form's elements.
+            beforeSend: function(xhr) {
+                // Let them know we are saving
+                $('.form-status-holder').html('Saving...');
+            },
+            success: function(data) {
+                var jqObj = jQuery(data); // You can get data returned from your ajax call here. ex. jqObj.find('.returned-data').html()
+                // Now show them we saved and when we did
+                var d = new Date();
+                $('.form-status-holder').html('Saved! Last: ' + d.toLocaleTimeString());
+            },
+        });
+    }
+
+</script>
